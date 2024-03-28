@@ -8,6 +8,25 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
+export const posts = sqliteTable(
+  "post",
+  {
+    id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    name: text("name", { length: 256 }),
+    createdAt: int("created_at", { mode: "timestamp" })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    createdById: text("createdById", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    updatedAt: int("updatedAt", { mode: "timestamp" }),
+  },
+  (example) => ({
+    createdByIdIdx: index("createdById_idx").on(example.createdById),
+    nameIndex: index("name_idx").on(example.name),
+  }),
+);
+
 export const users = sqliteTable("user", {
   id: text("id", { length: 255 }).notNull().primaryKey(),
   name: text("name", { length: 255 }),

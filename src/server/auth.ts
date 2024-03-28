@@ -37,16 +37,15 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db) as Adapter,
-  //  callbacks: {
-
-  //   session: ({ session, token }) => ({
-  //     ...session,
-  //     user: {
-  //       ...session.user,
-  //       id: token.sub,
-  //     },
-  //   }),
-  // },
+  callbacks: {
+    session: ({ session, user }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: user.id,
+      },
+    }),
+  },
   providers: [
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,

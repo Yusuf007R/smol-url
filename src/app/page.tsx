@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+import Auth from "@/components/auth";
 import { CreatePost } from "@/components/create-post";
 import { getServerAuthSession } from "@/server/auth";
+import { api } from "@/trpc/server";
 
 export default async function Home() {
-  const hello = { greeting: "Hello, world!" };
+  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await getServerAuthSession();
 
   return (
@@ -46,12 +48,7 @@ export default async function Home() {
             <p className="text-center text-2xl text-white">
               {session && <span>Logged in as {session.user?.name}</span>}
             </p>
-            <Link
-              href={session ? "/api/auth/signout" : "/api/auth/signin"}
-              className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-            >
-              {session ? "Sign out" : "Sign in"}
-            </Link>
+            <Auth session={session}></Auth>
           </div>
         </div>
 
@@ -65,7 +62,7 @@ async function CrudShowcase() {
   const session = await getServerAuthSession();
   if (!session?.user) return null;
 
-  const latestPost = { name: "My first post" };
+  const latestPost = await api.post.getLatest();
 
   return (
     <div className="w-full max-w-xs">
